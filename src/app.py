@@ -1,9 +1,9 @@
 from fastapi import FastAPI
-from src.api.router_api import router_api
+from src.api.items import router as items_router
 
 
 app = FastAPI(title='FastAPI')
-app.include_router(router_api, tags=['comands'])
+app.include_router(items_router, tags=['comands'], prefix='/items')
 
 
 if __name__ == '__main__':
