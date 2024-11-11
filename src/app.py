@@ -1,11 +1,43 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from src.api.items import router as items_router
+import logging
+from src.core.logger_config import init_logger, LOGGING_CONFIG
+from starlette.responses import JSONResponse
+from time import monotonic
 
-
+init_logger()
+logger = logging.getLogger()
 app = FastAPI(title='FastAPI')
 app.include_router(items_router, tags=['comands'], prefix='/items')
 
 
+
+@app.exception_handler(Exception)
+async def common_exception_handler(request: Request, exc: Exception):
+    return JSONResponse(
+        status_code=500,
+        content={
+            'message': (
+                f'Failed method {request.method} at URL {request.url}'
+                f'exception message is {exc!r}.'
+            )
+        },
+    )
+
+
+
+@app.middleware('http')
+async def time_log_middleware(request: Request, call_next):
+    start_time = monotonic()
+    try:
+        return await call_next(request)
+    finally:
+        finish_time = 1000.0 * (monotonic() - start_time)
+        process_time = '{:0.6f}|ms'.format(finish_time)
+        logger.info(f'Response: {request.url.path} Duration {process_time}')
+
+
+
 if __name__ == '__main__':
     import uvicorn
-    uvicorn.run(app, host='127.0.0.1', port=8000)
+    uvicorn.run(app, host='127.0.0.1', port=8000, log_config=LOGGING_CONFIG)
