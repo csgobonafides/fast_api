@@ -6,7 +6,7 @@ LOGGING_CONFIG = {
     'disable_existing_loggers': False,
     'formatters': {
         'custom_json_formatter': {
-            "format": "{'time':'%(asctime)s', 'logger_name': '%(name)s', 'level': '%(levelname)s', 'message': '%(message)s', 'filename': '%(filename)s', 'funcName': '%(funcName)s', 'lineno': '%(lineno)s'}"
+            "format": "{'time': '%(asctime)s', 'logger_name': '%(name)s', 'level': '%(levelname)s', 'message': '%(message)s', 'filename': '%(filename)s', 'funcName': '%(funcName)s', 'lineno': '%(lineno)s'}"
         }
     },
     'handlers': {

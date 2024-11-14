@@ -21,4 +21,4 @@ async def read_items() -> list[Item]:
 
 @router.get('/exceptions')
 async def exceptions():
-    raise 2 / 0
+    return 2 / 0
