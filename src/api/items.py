@@ -1,5 +1,6 @@
-from fastapi import APIRouter
-from src.schemas.items import Item
+from fastapi import APIRouter, Depends, Request, Response
+from src.schemas.lamps import LampIN, LampOUT, LampDtlInfo
+from src.controllers.work_to_db import get_controller
 import logging
 
 
@@ -7,18 +8,31 @@ router = APIRouter()
 logger = logging.getLogger('items_router')
 
 
-@router.post("/{items}")
-async def create_item(item: Item) -> Item:
-    return item
+@router.post("/add_lamp")
+async def add_lamp(lamp: LampIN, controller = Depends(get_controller)) -> LampIN:
+    return await controller.add_lamp(lamp)
 
 
-@router.get("/")
-async def read_items() -> list[Item]:
-    return [
-        Item(name="Portal Gun", price=42.0),
-        Item(name="Plumbus", price=32.0),
-        ]
+@router.get('/get_all')
+async def get_all(controller = Depends(get_controller)) -> list[LampOUT]:
+    return await controller.get_all()
 
-@router.get('/exceptions')
-async def exceptions():
-    return 2 / 0
+
+@router.post('/get_by_id')
+async def get_by_id(id: int, controller = Depends(get_controller)) -> LampDtlInfo:
+    return await controller.get_by_id(id)
+
+
+@router.delete('/del_by_id')
+async def del_by_id(id: int, controller = Depends(get_controller)):
+    return await controller.del_by_id(id)
+
+
+
+
+# @router.get("/")
+# async def read_items() -> list[Item]:
+#     return [
+#         Item(name="Portal Gun", price=42.0),
+#         Item(name="Plumbus", price=32.0),
+#         ]

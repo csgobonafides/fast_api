@@ -1,13 +1,28 @@
+from pathlib import Path
 from fastapi import FastAPI, Request
 from src.api.items import router as items_router
 import logging
+from contextlib import asynccontextmanager
 from src.core.logger_config import init_logger, LOGGING_CONFIG
 from starlette.responses import JSONResponse
+from src.storages.jsonfilestorage import JsonFileStorage
 from time import monotonic
+import src.controllers.work_to_db as c
+
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    dir = Path(__file__).parent.parent
+    lamp_db = JsonFileStorage(dir /'db.json')
+    await lamp_db.connect()
+    c.controller = c.Controller(lamp_db)
+    yield
+    await lamp_db.disconnect()
+
 
 init_logger()
-logger = logging.getLogger()
-app = FastAPI(title='FastAPI')
+logger = logging.getLogger(__name__)
+app = FastAPI(lifespan=lifespan, title='FastAPI')
 app.include_router(items_router, tags=['comands'], prefix='/items')
 
 
@@ -23,7 +38,6 @@ async def common_exception_handler(request: Request, exc: Exception):
             )
         },
     )
-
 
 
 @app.middleware('http')
