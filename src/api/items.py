@@ -28,6 +28,11 @@ async def del_by_id(id: int, controller = Depends(get_controller)):
     return await controller.del_by_id(id)
 
 
+@router.get('/tested')
+async def tested():
+    return 3 * 2
+
+
 
 
 # @router.get("/")

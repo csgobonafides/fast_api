@@ -12,3 +12,9 @@ async def test_xclient_debug_exceptions(xclient_debug: AsyncClient):
 async def test_xclient_exceptions(xclient: AsyncClient):
     response = await xclient.get('/items/exceptions')
     assert response.status_code == 500
+
+
+@pytest.mark.asyncio
+async def test_tested(xclient: AsyncClient):
+    response = await xclient.get('/items/tested')
+    assert response.status_code == 200
