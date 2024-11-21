@@ -8,7 +8,6 @@ from core.logger_config import init_logger, LOGGING_CONFIG
 from starlette.responses import JSONResponse
 from storages.jsonfilestorage import JsonFileStorage
 from time import monotonic
-import os
 
 import controllers.work_to_db as c
 
@@ -18,7 +17,7 @@ async def lifespan(_app: FastAPI):
     dir = Path(__file__).parent.parent
     db_path = dir /'db.json'
     if not db_path.is_file():
-        async with open(db_path, 'w') as file:
+        with open(db_path, 'w') as file:
             json.dump({}, file)
     lamp_db = JsonFileStorage(db_path)
     await lamp_db.connect()
