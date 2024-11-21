@@ -1,19 +1,26 @@
+import json
 from pathlib import Path
 from fastapi import FastAPI, Request
-from src.api.items import router as items_router
+from api.items import router as items_router
 import logging
 from contextlib import asynccontextmanager
-from src.core.logger_config import init_logger, LOGGING_CONFIG
+from core.logger_config import init_logger, LOGGING_CONFIG
 from starlette.responses import JSONResponse
-from src.storages.jsonfilestorage import JsonFileStorage
+from storages.jsonfilestorage import JsonFileStorage
 from time import monotonic
-import src.controllers.work_to_db as c
+import os
+
+import controllers.work_to_db as c
 
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     dir = Path(__file__).parent.parent
-    lamp_db = JsonFileStorage(dir /'db.json')
+    db_path = dir /'db.json'
+    if not db_path.is_file():
+        async with open(db_path, 'w') as file:
+            json.dump({}, file)
+    lamp_db = JsonFileStorage(db_path)
     await lamp_db.connect()
     c.controller = c.Controller(lamp_db)
     yield

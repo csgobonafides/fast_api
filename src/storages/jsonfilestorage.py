@@ -1,7 +1,7 @@
 import json
-from src.storages.base import CacheStorage
-from src._exceptions.to_exception import ForbiddenError, NotFoundError
-from src.schemas.lamps import LampIN
+from storages.base import CacheStorage
+from _exceptions.to_exception import ForbiddenError, NotFoundError
+from schemas.lamps import LampIN, LampDtlInfo
 
 
 class JsonFileStorage(CacheStorage):
@@ -25,33 +25,36 @@ class JsonFileStorage(CacheStorage):
 
     async def check_lamp(self, lamp: LampIN) -> bool:
         val = {"name": lamp.name, "price": lamp.price, "shape": lamp.shape, "base": lamp.base, "temperature": lamp.temperature}
-        for lamp_data in self.data.get('value')[0].values():
+        for lamp_data in self.data.values():
             comparison_data = {k: lamp_data[k] for k in lamp_data if k != 'id'}
             if comparison_data == val:
                 return False
             else:
                 return True
 
-    async def check_last_id(self) -> int:
-        id = self.data.get('id')
-        next_id = 1 + id
-        self.data['id'] = next_id
-        return next_id
+    async def check_last_id(self):
+        if list(self.data.keys()) == []:
+            return "1"
+        else:
+            next_id = str(int(list(self.data.keys())[-1]) + 1)
+            return next_id
 
     async def add(self, key: str, value: dict) -> None:
         if key in self.data:
             raise ForbiddenError('Ключ уже существует.')
-        self.data.get("value")[0][key] = value
+        self.data[key] = value
 
     async def get_all(self):
-        return list(self.data.get("value")[0].values())
+        return list(self.data.values())
 
-    async def get(self, key: int):
-        if str(key) not in self.data.get("value")[0].keys():
+    async def get(self, key: str) -> LampDtlInfo:
+        if key not in self.data:
             raise NotFoundError("Такого ключа не найдено.")
-        return self.data.get('value')[0].get(str(key))
+        return self.data.get(key)
 
-    async def delete(self, key: int) -> None:
-        if str(key) not in self.data.get("value")[0].keys():
+    async def delete(self, key: str):
+        if key not in self.data:
             raise NotFoundError('Такого ключа не найдено.')
-        self.data.get('value')[0].pop(str(key))
+        self.data.pop(key)
+        if key not in self.data:
+            return {"status": 200}
