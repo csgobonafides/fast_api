@@ -8,13 +8,13 @@ class Controller:
         self.product_db: JsonFileStorage = product_db
 
     async def add_lamp(self, lamp: LampIN) -> LampIN:
-        if await self.product_db.check_lamp(lamp) == True:
-            id = await self.product_db.check_last_id()
-            result = {"id": id, "name": lamp.name, "price": lamp.price, "shape": lamp.shape, "base": lamp.base, "temperature": lamp.temperature}
-            await self.product_db.add(id, result)
-            return lamp
-        else:
+        if not await self.product_db.check_lamp(lamp):
             raise ForbiddenError('This product already exists in the database.')
+
+        id = await self.product_db.check_last_id()
+        result = {"id": id, "name": lamp.name, "price": lamp.price, "shape": lamp.shape, "base": lamp.base, "temperature": lamp.temperature}
+        await self.product_db.add(id, result)
+        return lamp
 
 
     async def get_all(self) -> list[LampOUT]:

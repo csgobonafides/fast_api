@@ -25,15 +25,3 @@ async def get_by_id(id: str, controller=Depends(get_controller)) -> LampDtlInfo:
 @router.delete('/del_by_id')
 async def del_by_id(id: str, controller=Depends(get_controller)):
     return await controller.del_by_id(id)
-
-
-@router.get('/tested')
-async def tested():
-    return 3 * 2
-
-# @router.get("/")
-# async def read_items() -> list[Item]:
-#     return [
-#         Item(name="Portal Gun", price=42.0),
-#         Item(name="Plumbus", price=32.0),
-#         ]

@@ -25,12 +25,14 @@ class JsonFileStorage(CacheStorage):
 
     async def check_lamp(self, lamp: LampIN) -> bool:
         val = {"name": lamp.name, "price": lamp.price, "shape": lamp.shape, "base": lamp.base, "temperature": lamp.temperature}
-        for lamp_data in self.data.values():
-            comparison_data = {k: lamp_data[k] for k in lamp_data if k != 'id'}
-            if comparison_data == val:
-                return False
-            else:
-                return True
+        if list(self.data.values()) == []:
+            return True
+        else:
+            for lamp_data in self.data.values():
+                comparison_data = {k: lamp_data[k] for k in lamp_data if k != 'id'}
+                if comparison_data == val:
+                    return False
+            return True
 
     async def check_last_id(self):
         if list(self.data.keys()) == []:
