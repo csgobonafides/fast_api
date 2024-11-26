@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Request, Response
+from fastapi import APIRouter, Depends, Request, Response, status
 from schemas.lamps import LampIN, LampOUT, LampDtlInfo
 from controllers.work_to_db import get_controller
 import logging
@@ -17,11 +17,11 @@ async def get_all(controller=Depends(get_controller)) -> list[LampOUT]:
     return await controller.get_all()
 
 
-@router.post('/get_by_id')
-async def get_by_id(id: str, controller=Depends(get_controller)) -> LampDtlInfo:
-    return await controller.get_by_id(id)
+@router.get('/{lamp_id}')
+async def get_by_id(lamp_id: str, controller=Depends(get_controller)) -> LampDtlInfo:
+    return await controller.get_by_id(lamp_id)
 
 
-@router.delete('/del_by_id')
-async def del_by_id(id: str, controller=Depends(get_controller)):
-    return await controller.del_by_id(id)
+@router.delete('/{lamp_id}', status_code=status.HTTP_204_NO_CONTENT)
+async def del_by_id(lamp_id: str, controller=Depends(get_controller)):
+    return await controller.del_by_id(lamp_id)

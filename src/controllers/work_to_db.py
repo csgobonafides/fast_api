@@ -40,3 +40,7 @@ def get_controller():
     if controller is None:
         raise ForbiddenError('Controller is none.')
     return controller
+
+
+class CarController:
+    pass
