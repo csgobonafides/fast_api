@@ -14,7 +14,7 @@ class Controller:
         last_id = await self.product_db.check_last_id()
         result = {"id": last_id, "name": lamp.name, "price": lamp.price, "shape": lamp.shape, "base": lamp.base, "temperature": lamp.temperature}
         await self.product_db.add(last_id, result)
-        return lamp
+        return result
 
 
     async def get_all(self) -> list[LampOUT]:
