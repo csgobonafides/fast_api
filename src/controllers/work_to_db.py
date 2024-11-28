@@ -11,9 +11,9 @@ class Controller:
         if not await self.product_db.check_lamp(lamp):
             raise ForbiddenError('This product already exists in the database.')
 
-        id = await self.product_db.check_last_id()
-        result = {"id": id, "name": lamp.name, "price": lamp.price, "shape": lamp.shape, "base": lamp.base, "temperature": lamp.temperature}
-        await self.product_db.add(id, result)
+        last_id = await self.product_db.check_last_id()
+        result = {"id": last_id, "name": lamp.name, "price": lamp.price, "shape": lamp.shape, "base": lamp.base, "temperature": lamp.temperature}
+        await self.product_db.add(last_id, result)
         return lamp
 
 
@@ -22,12 +22,12 @@ class Controller:
         return lamp
 
 
-    async def get_by_id(self, id: str) -> LampDtlInfo:
-        return await self.product_db.get(id)
+    async def get_by_id(self, lamp_id: str) -> LampDtlInfo:
+        return await self.product_db.get(lamp_id)
 
 
-    async def del_by_id(self, id: str):
-        return await self.product_db.delete(id)
+    async def del_by_id(self, lamp_id: str):
+        return await self.product_db.delete(lamp_id)
 
 
 
