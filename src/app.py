@@ -29,7 +29,7 @@ async def lifespan(_app: FastAPI):
 init_logger()
 logger = logging.getLogger(__name__)
 app = FastAPI(lifespan=lifespan, title='FastAPI')
-app.include_router(items_router, tags=['comands'], prefix='/items')
+app.include_router(items_router, tags=['comands'], prefix='/lamps')
 
 
 

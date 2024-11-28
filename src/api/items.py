@@ -7,12 +7,12 @@ router = APIRouter()
 logger = logging.getLogger('items_router')
 
 
-@router.post("/lamp", status_code=status.HTTP_201_CREATED)
+@router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_lamp(lamp: LampIN, controller=Depends(get_controller)) -> LampIN:
     return await controller.add_lamp(lamp)
 
 
-@router.get('/lamps')
+@router.get('/')
 async def get_lamp_list(controller=Depends(get_controller)) -> list[LampOUT]:
     return await controller.get_all()
 
