@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Request, Response, status
 from schemas.lamps import LampIN, LampOUT, LampDtlInfo
-from controllers.work_to_db import get_controller
+from controllers.lamps_controller import get_controller
 import logging
 
 router = APIRouter()
@@ -23,5 +23,6 @@ async def get_by_id(lamp_id: str, controller=Depends(get_controller)) -> LampDtl
 
 
 @router.delete('/{lamp_id}', status_code=status.HTTP_204_NO_CONTENT)
-async def delete_by_id(lamp_id: str, controller=Depends(get_controller)):
+async def delete_by_id(lamp_id: str, controller=Depends(get_controller)) -> None:
     await controller.del_by_id(lamp_id)
+    return

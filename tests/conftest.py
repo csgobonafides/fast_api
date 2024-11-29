@@ -2,7 +2,7 @@ import pytest
 import pytest_asyncio
 from httpx import AsyncClient
 import json
-import controllers.work_to_db as lamp_module
+import controllers.lamps_controller as lamp_module
 
 from app import app
 from storages.jsonfilestorage import JsonFileStorage
@@ -12,9 +12,9 @@ from storages.jsonfilestorage import JsonFileStorage
 @pytest_asyncio.fixture(autouse=True)
 async def lamp_controller(tmp_path) -> lamp_module.Controller:
     data = {
-        "1": {"id": "1", "name": "gauss", "price": 134.2, "shape": "R50", "base": "E14", "temperature": "cw"},
-        "2": {"id": "2", "name": "sweko", "price": 89.0, "shape": "A60", "base": "E27", "temperature": "nw"},
-        "3": {"id": "3", "name": "uniel", "price": 13.2, "shape": "A60", "base": "E27", "temperature": "nw"}
+        "1": {"id": "1", "name": "gauss", "price": 134.2, "article": 112233, "shape": "R50", "base": "E14", "temperature": "cw"},
+        "2": {"id": "2", "name": "sweko", "price": 89.0, "article": 441122, "shape": "A60", "base": "E27", "temperature": "nw"},
+        "3": {"id": "3", "name": "uniel", "price": 13.2, "article": 379283, "shape": "A60", "base": "E27", "temperature": "nw"}
     }
     json_file = tmp_path / 'db.json'
     with open(json_file, 'w') as file:

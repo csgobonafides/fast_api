@@ -8,12 +8,13 @@ class Controller:
         self.product_db: JsonFileStorage = product_db
 
     async def add_lamp(self, lamp: LampIN) -> LampIN:
-        if not await self.product_db.check_lamp(lamp):
-            raise ForbiddenError('This product already exists in the database.')
+        for lmp in self.product_db.data.values():
+            if lmp.get('article') == lamp.article:
+                raise ForbiddenError('This product already exists in the database.')
 
-        last_id = await self.product_db.check_last_id()
-        result = {"id": last_id, "name": lamp.name, "price": lamp.price, "shape": lamp.shape, "base": lamp.base, "temperature": lamp.temperature}
-        await self.product_db.add(last_id, result)
+        next_id = str(int(list(self.product_db.data.keys())[-1]) + 1) if list(self.product_db.data.keys()) != [] else 1
+        result = {"id": next_id, "name": lamp.name, "price": lamp.price, "article": lamp.article, "shape": lamp.shape, "base": lamp.base, "temperature": lamp.temperature}
+        await self.product_db.add(next_id, result)
         return result
 
 
@@ -26,8 +27,8 @@ class Controller:
         return await self.product_db.get(lamp_id)
 
 
-    async def del_by_id(self, lamp_id: str):
-        return await self.product_db.delete(lamp_id)
+    async def del_by_id(self, lamp_id: str) -> None:
+        await self.product_db.delete(lamp_id)
 
 
 

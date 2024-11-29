@@ -5,6 +5,7 @@ from pydantic import BaseModel
 class LampBase(BaseModel):
     name: str
     price: float
+    article: int
 
 
 class LampIN(LampBase):

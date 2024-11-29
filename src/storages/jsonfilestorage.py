@@ -23,23 +23,6 @@ class JsonFileStorage(CacheStorage):
             json.dump(self.data, file)
 
 
-    async def check_lamp(self, lamp: LampIN) -> bool:
-        val = {"name": lamp.name, "price": lamp.price, "shape": lamp.shape, "base": lamp.base, "temperature": lamp.temperature}
-        if list(self.data.values()) == []:
-            return True
-        else:
-            for lamp_data in self.data.values():
-                comparison_data = {k: lamp_data[k] for k in lamp_data if k != 'id'}
-                if comparison_data == val:
-                    return False
-            return True
-
-    async def check_last_id(self):
-        if list(self.data.keys()) == []:
-            return "1"
-        else:
-            next_id = str(int(list(self.data.keys())[-1]) + 1)
-            return next_id
 
     async def add(self, key: str, value: dict) -> None:
         if key in self.data:
@@ -54,9 +37,9 @@ class JsonFileStorage(CacheStorage):
             raise NotFoundError("Такого ключа не найдено.")
         return self.data.get(key)
 
-    async def delete(self, key: str):
+    async def delete(self, key: str) -> None:
         if key not in self.data:
             raise NotFoundError('Такого ключа не найдено.')
         self.data.pop(key)
         if key not in self.data:
-            return {"status": 200}
+            return
