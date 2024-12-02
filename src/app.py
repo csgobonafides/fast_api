@@ -8,14 +8,17 @@ from core.logger_config import init_logger, LOGGING_CONFIG
 from starlette.responses import JSONResponse
 from storages.jsonfilestorage import JsonFileStorage
 from time import monotonic
+from core.settings import get_settings
 
 import controllers.lamps_controller as c
+
+settings = get_settings()
 
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     dir = Path(__file__).parent.parent
-    db_path = dir /'db.json'
+    db_path = dir / settings.DB_PATH
     if not db_path.is_file():
         with open(db_path, 'w') as file:
             json.dump({}, file)
@@ -30,7 +33,6 @@ init_logger()
 logger = logging.getLogger(__name__)
 app = FastAPI(lifespan=lifespan, title='FastAPI')
 app.include_router(lamps_router, tags=['comands'], prefix='/lamps')
-
 
 
 @app.exception_handler(Exception)
@@ -57,7 +59,7 @@ async def time_log_middleware(request: Request, call_next):
         logger.info(f'Response: {request.url.path} Duration {process_time}')
 
 
-
 if __name__ == '__main__':
     import uvicorn
+
     uvicorn.run(app, host='127.0.0.1', port=8000, log_config=LOGGING_CONFIG)

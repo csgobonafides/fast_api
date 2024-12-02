@@ -18,7 +18,7 @@ LOGGING_CONFIG = {
             'stream': 'ext://sys.stdout'
         }
     },
-    'logers': {
+    'loggers': {
         "uvicorn": {"handlers": ["stream_handler"], "level": "INFO", "propagate": 0},
         "uvicorn.error": {"handlers": ["stream_handler"], "level": "INFO",  "propagate": 0},
         "uvicorn.access": {"handlers": ["stream_handler"], "level": "INFO", "propagate": 0},

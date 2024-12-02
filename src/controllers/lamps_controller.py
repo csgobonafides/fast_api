@@ -1,4 +1,4 @@
-from _exceptions.to_exception import ForbiddenError, NotFoundError
+from core.to_exception import BadRequestError
 from storages.jsonfilestorage import JsonFileStorage
 from schemas.lamps import LampIN, LampDtlInfo, LampOUT
 
@@ -7,12 +7,12 @@ class Controller:
     def __init__(self, product_db):
         self.product_db: JsonFileStorage = product_db
 
-    async def add_lamp(self, lamp: LampIN) -> LampIN:
+    async def add_lamp(self, lamp: LampIN) -> LampDtlInfo:
         for lmp in self.product_db.data.values():
             if lmp.get('article') == lamp.article:
-                raise ForbiddenError('This product already exists in the database.')
+                raise BadRequestError('This product already exists in the database.')
 
-        next_id = str(int(list(self.product_db.data.keys())[-1]) + 1) if list(self.product_db.data.keys()) != [] else 1
+        next_id = str(int(max(self.product_db.data.keys())) + 1) if list(self.product_db.data.keys()) != [] else "1"
         result = {"id": next_id, "name": lamp.name, "price": lamp.price, "article": lamp.article, "shape": lamp.shape, "base": lamp.base, "temperature": lamp.temperature}
         await self.product_db.add(next_id, result)
         return result
@@ -33,15 +33,9 @@ class Controller:
 
 
 
-
-
 controller = None
 
 def get_controller():
     if controller is None:
-        raise ForbiddenError('Controller is none.')
+        raise BadRequestError('Controller is none.')
     return controller
-
-
-class CarController:
-    pass

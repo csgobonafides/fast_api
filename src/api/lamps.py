@@ -1,10 +1,8 @@
-from fastapi import APIRouter, Depends, Request, Response, status
+from fastapi import APIRouter, Depends, status
 from schemas.lamps import LampIN, LampOUT, LampDtlInfo
 from controllers.lamps_controller import get_controller
-import logging
 
 router = APIRouter()
-logger = logging.getLogger('items_router')
 
 
 @router.post("/", response_model=LampDtlInfo, status_code=status.HTTP_201_CREATED)

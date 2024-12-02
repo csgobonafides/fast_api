@@ -8,7 +8,6 @@ from app import app
 from storages.jsonfilestorage import JsonFileStorage
 
 
-
 @pytest_asyncio.fixture(autouse=True)
 async def lamp_controller(tmp_path) -> lamp_module.Controller:
     data = {

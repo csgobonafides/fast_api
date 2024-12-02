@@ -1,7 +1,7 @@
 import json
 from storages.base import CacheStorage
-from _exceptions.to_exception import ForbiddenError, NotFoundError
-from schemas.lamps import LampIN, LampDtlInfo
+from core.to_exception import ForbiddenError, NotFoundError
+from schemas.lamps import LampDtlInfo
 
 
 class JsonFileStorage(CacheStorage):
