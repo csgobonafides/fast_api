@@ -13,7 +13,13 @@ class Controller:
                 raise BadRequestError('This product already exists in the database.')
 
         next_id = str(int(max(self.product_db.data.keys())) + 1) if list(self.product_db.data.keys()) != [] else "1"
-        result = {"id": next_id, "name": lamp.name, "price": lamp.price, "article": lamp.article, "shape": lamp.shape, "base": lamp.base, "temperature": lamp.temperature}
+        result = {"id": next_id,
+                  "name": lamp.name,
+                  "price": lamp.price,
+                  "article": lamp.article,
+                  "shape": lamp.shape,
+                  "base": lamp.base,
+                  "temperature": lamp.temperature}
         await self.product_db.add(next_id, result)
         return LampDtlInfo(**result)
 
