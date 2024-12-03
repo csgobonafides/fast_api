@@ -1,4 +1,4 @@
-from typing import Union, Literal
+from typing import Literal
 from pydantic import BaseModel
 
 
@@ -13,8 +13,10 @@ class LampIN(LampBase):
     base: Literal["E40", "E27", "E14"]
     temperature: Literal['ww', 'nw', 'cw']
 
+
 class LampOUT(LampBase):
     id: str
+
 
 class LampDtlInfo(LampBase):
     id: str

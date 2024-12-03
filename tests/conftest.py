@@ -23,6 +23,7 @@ async def lamp_controller(tmp_path) -> lamp_module.Controller:
     lamp_module.controller = lamp_module.Controller(lamp_db)
     yield lamp_module.controller
 
+
 @pytest.fixture
 def lamp_db(lamp_controller: lamp_module.Controller) -> JsonFileStorage:
     return lamp_controller.product_db

@@ -17,8 +17,8 @@ settings = get_settings()
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
-    dir = Path(__file__).parent.parent
-    db_path = dir / settings.DB_PATH
+    dirr = Path(__file__).parent.parent
+    db_path = dirr / settings.DB_PATH
     if not db_path.is_file():
         with open(db_path, 'w') as file:
             json.dump({}, file)

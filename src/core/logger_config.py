@@ -1,6 +1,4 @@
 from logging.config import dictConfig
-from logging import FileHandler
-from logging.handlers import RotatingFileHandler
 
 
 LOGGING_CONFIG = {

@@ -19,6 +19,7 @@ async def test_add_lamp_200(xclient: AsyncClient, lamp_db: JsonFileStorage):
     }
     assert await lamp_db.get('4') == {"id": "4", "name": "PRO", "price": 203.42, "article": 440101, "shape": "R50", "base": "E14", "temperature": "ww"}
 
+
 @pytest.mark.asyncio
 async def test_add_lamp_dubl_403(xclient: AsyncClient):
     payload = {"name": "gauss", "price": 134.2, "article": 112233, "shape": "R50", "base": "E14", "temperature": "cw"}
@@ -36,7 +37,7 @@ async def test_add_lamp_non_type_422_price(xclient: AsyncClient):
                 "detail": [
                 {
                     "type": "float_parsing",
-                    "loc": ["body", "price" ],
+                    "loc": ["body", "price"],
                     "msg": "Input should be a valid number, unable to parse string as a number",
                     "input": "qwe"
                 }

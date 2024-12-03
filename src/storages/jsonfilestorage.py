@@ -1,11 +1,10 @@
 import json
 from storages.base import CacheStorage
 from core.to_exception import ForbiddenError, NotFoundError
-from schemas.lamps import LampDtlInfo
 
 
 class JsonFileStorage(CacheStorage):
-    def __init__(self, file_path = None):
+    def __init__(self, file_path=None):
         self.file_path = file_path
         self.data = {}
 
@@ -22,8 +21,6 @@ class JsonFileStorage(CacheStorage):
         with open(self.file_path, 'w') as file:
             json.dump(self.data, file)
 
-
-
     async def add(self, key: str, value: dict) -> None:
         if key in self.data:
             raise ForbiddenError('Ключ уже существует.')
@@ -32,7 +29,7 @@ class JsonFileStorage(CacheStorage):
     async def get_all(self):
         return list(self.data.values())
 
-    async def get(self, key: str) -> LampDtlInfo:
+    async def get(self, key: str) -> dict:
         if key not in self.data:
             raise NotFoundError("Такого ключа не найдено.")
         return self.data.get(key)
