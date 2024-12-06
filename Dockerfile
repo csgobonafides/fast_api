@@ -1,6 +1,6 @@
 FROM python:3.9.2-slim-buster
 
-WORKDIR /fast_api/src
+WORKDIR /fast_api
 
 ENV TZ 'UTC'
 ENV PYTHONUNBUFFERED=1
@@ -16,6 +16,6 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-CMD ["uvicorn", "app:app", "--host", "127.0.0.1", "--port", "8000"]
+CMD ["uvicorn", "app:app", "--host", "127.0.0.1", "--port", "8000", "--log-config", "core/logging.yaml"]
 
 # , "--log-config", "core/logging.yaml"
