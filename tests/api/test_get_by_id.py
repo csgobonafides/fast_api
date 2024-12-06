@@ -19,4 +19,4 @@ async def test_get_by_id_200(xclient: AsyncClient, lamp_id, expected: LampDtlInf
 async def test_get_by_id_404(xclient: AsyncClient):
     response = await xclient.get("/lamps/999")
     assert response.status_code == 404, response.text
-    assert response.json() == {"detail": "Такого ключа не найдено."}
+    assert response.json() == {"detail": "not_found_error"}
