@@ -2,7 +2,7 @@ version: '3.4'
 
 services:
   app:
-    container_name: appp
+    container_name: app
     build: ./
     ports:
       - '8000:8000'

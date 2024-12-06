@@ -34,15 +34,16 @@ async def test_add_lamp_non_type_422_price(xclient: AsyncClient):
     response = await xclient.post('/lamps/', json=payload)
     assert response.status_code == 422, response.text
     assert response.json() == {
-                "detail": [
-                {
-                    "type": "float_parsing",
-                    "loc": ["body", "price"],
-                    "msg": "Input should be a valid number, unable to parse string as a number",
-                    "input": "qwe"
-                }
-            ]
-        }
+        "detail": [
+            {
+                "type": "float_parsing",
+                "loc": ["body", "price"],
+                "msg": "Input should be a valid number, unable to parse string as a number",
+                "input": "qwe"
+            }
+        ]
+    }
+
 
 @pytest.mark.asyncio
 async def test_add_lamp_non_type_422_name(xclient: AsyncClient):

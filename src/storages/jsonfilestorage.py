@@ -1,6 +1,6 @@
 import json
 from storages.base import CacheStorage
-from core.to_exception import ForbiddenError, NotFoundError
+from core.exceptions import NotFoundError, BadRequestError
 
 
 class JsonFileStorage(CacheStorage):
@@ -8,14 +8,14 @@ class JsonFileStorage(CacheStorage):
         self.file_path = file_path
         self.data = {}
 
-    async def connect(self):
+    async def connect(self) -> None:
         if self.file_path is None:
             return
 
         with open(self.file_path, 'r') as file:
             self.data = json.load(file)
 
-    async def disconnect(self):
+    async def disconnect(self) -> None:
         if self.file_path is None:
             return
         with open(self.file_path, 'w') as file:
@@ -23,20 +23,20 @@ class JsonFileStorage(CacheStorage):
 
     async def add(self, key: str, value: dict) -> None:
         if key in self.data:
-            raise ForbiddenError('Ключ уже существует.')
+            raise BadRequestError("Such a key already exists.")
         self.data[key] = value
 
-    async def get_all(self):
+    async def get_all(self) -> list[dict]:
         return list(self.data.values())
 
     async def get(self, key: str) -> dict:
         if key not in self.data:
-            raise NotFoundError("Такого ключа не найдено.")
+            raise NotFoundError
         return self.data.get(key)
 
     async def delete(self, key: str) -> None:
         if key not in self.data:
-            raise NotFoundError('Такого ключа не найдено.')
+            raise NotFoundError
         self.data.pop(key)
         if key not in self.data:
             return
