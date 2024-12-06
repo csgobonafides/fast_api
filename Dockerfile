@@ -14,8 +14,6 @@ COPY requirements.txt requirements.txt
 
 RUN pip3 install --no-cache-dir -r requirements.txt
 
-COPY . .
+COPY ./src .
 
 CMD ["uvicorn", "app:app", "--host", "127.0.0.1", "--port", "8000", "--log-config", "core/logging.yaml"]
-
-# , "--log-config", "core/logging.yaml"

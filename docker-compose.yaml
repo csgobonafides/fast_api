@@ -4,10 +4,8 @@ services:
   app:
     container_name: app
     build: ./
-    volumes:
-      - ./src:/app/src
     environment:
-      - PYTHONPATH=/app/src
+      DB_PATH: $DB_PATH
     ports:
       - '8000:8000'
     restart: always
