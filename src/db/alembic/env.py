@@ -1,16 +1,14 @@
-from logging.config import fileConfig
 from sqlalchemy import create_engine
 from alembic import context
 from src.db.models import Base
-from src.core.settings import get_db_settings
+from src.core.settings import get_settings
 
 config = context.config
-fileConfig(config.config_file_name)
 target_metadata = Base.metadata
 
 
 def run_migrations_online() -> None:
-    db_conf = get_db_settings()
+    db_conf = get_settings()
     connectable = create_engine(db_conf.dsn())
 
     with connectable.connect() as connection:

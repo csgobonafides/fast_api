@@ -2,12 +2,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(extra='ignore', env_file='.env')
+    model_config = SettingsConfigDict(env_file='.env')
     DB_PATH: str
-
-
-class DBConfig(BaseSettings):
-    model_config = SettingsConfigDict(extra='ignore', env_file='.env')
     POSTGRES_HOST: str
     POSTGRES_PORT: int
     POSTGRES_USER: str
@@ -20,7 +16,3 @@ class DBConfig(BaseSettings):
 
 def get_settings() -> Settings:
     return Settings()
-
-
-def get_db_settings():
-    return DBConfig()
