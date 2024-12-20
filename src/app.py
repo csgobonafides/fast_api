@@ -1,38 +1,35 @@
-import json
-from pathlib import Path
 from fastapi import FastAPI, Request
-from api.lamps import router as lamps_router
+from databases import Database
+from api.lamps import router as lamp_router
+from api.manufacturers import router as manufacturer_router
 import logging
 from contextlib import asynccontextmanager
 from starlette.responses import JSONResponse
-from storages.jsonfilestorage import JsonFileStorage
 from time import monotonic
 from core.settings import get_settings
 
-import controllers.lamps_controller as c
+import controllers.lamp as lamp_modul
+import controllers.manufacturer as manufacturer_modul
 
-settings = get_settings()
+config = get_settings()
+db = Database(config.dsn())
 logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     logger.info("Do something at application startup")
-    dirr = Path(__file__).parent.parent
-    db_path = dirr / settings.DB_PATH
-    if not db_path.is_file():
-        with open(db_path, 'w') as file:
-            json.dump({}, file)
-    lamp_db = JsonFileStorage(db_path)
-    await lamp_db.connect()
-    c.controller = c.Controller(lamp_db)
+    await db.connect()
+    manufacturer_modul.manufacturer_controller = manufacturer_modul.ManufacturerController(db)
+    lamp_modul.lamp_controller = lamp_modul.LampController(db)
     yield
     logger.info("Do something at application shutdown")
-    await lamp_db.disconnect()
+    await db.disconnect()
 
 
 app = FastAPI(lifespan=lifespan, title='FastAPI')
-app.include_router(lamps_router, tags=['comands'], prefix='/lamps')
+app.include_router(manufacturer_router, tags=['manufacturer'], prefix='/manufacturer')
+app.include_router(lamp_router, tags=['lamp'], prefix='/lamp')
 
 
 @app.exception_handler(Exception)

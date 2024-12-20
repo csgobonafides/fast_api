@@ -1,6 +1,6 @@
 import pytest
 from httpx import AsyncClient
-from schemas.lamps import LampDtlInfo
+from schemas.lamp import LampDtlInfo
 
 
 @pytest.mark.asyncio
