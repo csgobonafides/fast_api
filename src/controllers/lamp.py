@@ -1,8 +1,8 @@
 import uuid
-from typing import cast
+from typing import cast, Literal
 
 from databases import Database
-from sqlalchemy import select, insert, delete
+from sqlalchemy import select, insert, delete, desc, asc
 from db.models import Lamp, Manufacturer
 from core.exceptions import BadRequestError, NotFoundError
 from schemas.lamp import LampDtlInfo, LampIN, LampOUT
@@ -33,11 +33,16 @@ class LampController:
         await self.db.execute(insert(Lamp).values(id=lamp_id, article=lamp.article, price=lamp.price, shape=lamp.shape,
                                                   base=lamp.base, temperature=lamp.temperature,
                                                   manufacturer_id=manufacturer_id[0]))
+        finish_query = (select(Lamp.create_at, Manufacturer.country)
+                        .join(Manufacturer, cast("ColumnElement[bool]", Lamp.manufacturer_id == Manufacturer.id)))
+        finish = await self.db.fetch_one(finish_query)
         return LampDtlInfo(id=str(lamp_id), article=lamp.article, manufacturer=lamp.manufacturer, price=lamp.price,
                            shape=lamp.shape, base=lamp.base, temperature=lamp.temperature,
-                           manufacturer_id=str(manufacturer_id[0]))
+                           create_at=str(finish["create_at"]),
+                           manufacturer_id=str(manufacturer_id[0]),
+                           country=finish["country"])
 
-    async def get_all(self) -> list[LampOUT]:
+    async def get_all(self, sort: Literal['asc', 'desc'] = "desc") -> list[LampOUT]:
         query = (
             select(
                 Lamp.id,
@@ -47,6 +52,7 @@ class LampController:
                 Manufacturer.country
             )
             .join(Manufacturer, cast("ColumnElement[bool]", Lamp.manufacturer_id == Manufacturer.id))
+            .order_by(desc(Lamp.price) if sort == "desc" else asc(Lamp.price))
         )
         rows = await self.db.fetch_all(query)
         result = [dict(row) for row in rows]
