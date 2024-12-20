@@ -25,11 +25,6 @@ class LampController:
         if article_lamp:
             raise NotFoundError("An object with this article already exists.")
 
-        existing_lamp_query = select(Lamp).where(Lamp.article == lamp.article)
-        existing_lamp = await self.db.fetch_one(existing_lamp_query)
-        if existing_lamp:
-            raise BadRequestError("An object with this article already exists")
-
         await self.db.execute(insert(Lamp).values(id=lamp_id, article=lamp.article, price=lamp.price, shape=lamp.shape,
                                                   base=lamp.base, temperature=lamp.temperature,
                                                   manufacturer_id=manufacturer_id[0]))
