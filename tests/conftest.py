@@ -4,6 +4,7 @@ import pytest_asyncio
 from httpx import AsyncClient
 from sqlalchemy import insert, select
 from sqlalchemy.orm import declarative_base
+from pathlib import Path
 from alembic import command
 from alembic.config import Config
 from databases import Database
@@ -21,7 +22,8 @@ async def test_db():
     db = Database('postgresql://mamba:mamba@localhost:7432/test_db')
     await db.connect()
 
-    alembic_cfg = Config('alembic.ini')
+    dir = Path(__file__).parent.parent
+    alembic_cfg = Config(dir / 'alembic.ini')
     command.upgrade(alembic_cfg, "head")
 
     one_id = uuid.uuid4()
