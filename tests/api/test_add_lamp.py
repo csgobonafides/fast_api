@@ -1,6 +1,5 @@
 import pytest
 from httpx import AsyncClient
-from storages.jsonfilestorage import JsonFileStorage
 
 
 @pytest.mark.asyncio

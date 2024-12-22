@@ -1,35 +1,71 @@
-import pytest
+import uuid
+
 import pytest_asyncio
 from httpx import AsyncClient
-import json
-import controllers.lamps_controller as lamp_module
+from sqlalchemy import insert, select
+from sqlalchemy.orm import declarative_base
+from alembic import command
+from alembic.config import Config
+from databases import Database
+from db.models import Lamp, Manufacturer
+import controllers.lamp as lamp_module
+import controllers.manufacturer as manufacter_module
 
 from app import app
-from storages.jsonfilestorage import JsonFileStorage
+
+Base = declarative_base()
+
+
+@pytest_asyncio.fixture(scope='module')
+async def test_db():
+    db = Database('postgresql://mamba:mamba@localhost:7432/test_db')
+    await db.connect()
+
+    alembic_cfg = Config('alembic.ini')
+    command.upgrade(alembic_cfg, "head")
+
+    one_id = uuid.uuid4()
+    await db.execute(insert(Manufacturer).values(id=one_id, manufacturer='gauss', country='usa'))
+    two_id = uuid.uuid4()
+    await db.execute(insert(Manufacturer).values(id=two_id, manufacturer='iek', country='russia'))
+    three_id = uuid.uuid4()
+    await db.execute(insert(Manufacturer).values(id=three_id, manufacturer='saffit', country='china'))
+
+    id_one = uuid.uuid4()
+    manuf_one = await db.execute(select(Manufacturer.id).where(Manufacturer.manufacturer == 'gauss'))
+    await db.execute(insert(Lamp).values(id=id_one, article=111111, price=23.6,  shape='R39', base='E14',
+                                         temperature='cw', manufacturer_id=manuf_one, ))
+    id_two = uuid.uuid4()
+    manuf_two = await db.execute(select(Manufacturer.id).where(Manufacturer.manufacturer == 'iek'))
+    await db.execute(insert(Lamp).values(id=id_two, article=222222, price=150.2, shape='R63', base='E27',
+                                         temperature='ww', manufacturer_id=manuf_two, ))
+
+    id_three = uuid.uuid4()
+    manuf_three = await db.execute(select(Manufacturer.id).where(Manufacturer.manufacturer == 'gauss'))
+    await db.execute(insert(Lamp).values(id=id_three, article=333333, price=54, shape='C37', base='E14',
+                                         temperature='cw', manufacturer_id=manuf_three, ))
+
+    id_four = uuid.uuid4()
+    manuf_four = await db.execute(select(Manufacturer.id).where(Manufacturer.manufacturer == 'saffit'))
+    await db.execute(insert(Lamp).values(id=id_four, article=444444, price=250.3, shape='G45', base='E27',
+                                         temperature='nw', manufacturer_id=manuf_four, ))
+
+    yield db
+
+    await db.execute("DROP SCHEMA public CASCADE; CREATE SCHEMA public;")
+    await db.disconnect()
 
 
 @pytest_asyncio.fixture(autouse=True)
-async def lamp_controller(tmp_path) -> lamp_module.Controller:
-    data = {
-        "1": {"id": "1", "name": "gauss", "price": 134.2,
-              "article": 112233, "shape": "R50", "base": "E14", "temperature": "cw"},
-        "2": {"id": "2", "name": "sweko", "price": 89.0,
-              "article": 441122, "shape": "A60", "base": "E27", "temperature": "nw"},
-        "3": {"id": "3", "name": "uniel", "price": 13.2,
-              "article": 379283, "shape": "A60", "base": "E27", "temperature": "nw"}
-    }
-    json_file = tmp_path / 'db.json'
-    with open(json_file, 'w') as file:
-        json.dump(data, file)
-    lamp_db = JsonFileStorage(json_file)
-    await lamp_db.connect()
-    lamp_module.controller = lamp_module.Controller(lamp_db)
-    yield lamp_module.controller
+async def lamp_controller(test_db) -> lamp_module.LampController:
+    lamp_module.lamp_controller = lamp_module.LampController(test_db)
+    yield lamp_module.lamp_controller
 
 
-@pytest.fixture
-def lamp_db(lamp_controller: lamp_module.Controller) -> JsonFileStorage:
-    return lamp_controller.product_db
+@pytest_asyncio.fixture(autouse=True)
+async def manufacter_controller(test_db) -> manufacter_module.ManufacturerController:
+    manufacter_module.manufacturer_controller = manufacter_module.ManufacturerController(test_db)
+    yield manufacter_module.manufacturer_controller
 
 
 @pytest_asyncio.fixture

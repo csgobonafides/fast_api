@@ -8,7 +8,7 @@ Base = declarative_base()
 class Manufacturer(Base):
     __tablename__ = "manufacturer"
     id = Column(UUID, primary_key=True)
-    manufacturer = Column(String(20), nullable=False)
+    manufacturer = Column(String(20), unique=True, nullable=False)
     country = Column(String(20), nullable=False)
     create_at = Column(DateTime, server_default=func.now(tz=timezone.utc))
 

@@ -13,6 +13,10 @@ class ManufacturerController:
 
     async def add_manufacturer(self, manufacturer: ManufacturerRequest) -> ManufacturerResponse:
         list_id = uuid.uuid4()
+        manuf_query = select(Manufacturer).where(Manufacturer.manufacturer == manufacturer.manufacturer)
+        row = await self.db.fetch_one(manuf_query)
+        if row:
+            raise NotFoundError("An object with this identifier already exists.")
         await self.db.execute(insert(Manufacturer).values(id=list_id, manufacturer=manufacturer.manufacturer,
                                                           country=manufacturer.country))
         return ManufacturerResponse(id=str(list_id), manufacturer=manufacturer.manufacturer,
