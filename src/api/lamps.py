@@ -11,9 +11,14 @@ async def create_lamp(lamp: LampIN, controller: LampController = Depends(get_con
     return await controller.add_lamp(lamp)
 
 
-@router.get('/', response_model=list[LampOUT])
-async def get_lamp_list(sort: Literal['asc', 'desc'] = "desc", controller: LampController = Depends(get_controller)) -> list[LampOUT]:
-    return await controller.get_all(sort)
+@router.get('/', response_model=list[LampDtlInfo])
+async def get_lamp_list(sort: Literal['asc', 'desc'] = "desc",
+                        filter: Literal['shape', 'base', 'temperature'] = None,
+                        detail: Literal['A60', 'C37', 'G45', 'R39', 'R50', 'R63',
+                        'E40', 'E27', 'E14',
+                        'ww', 'nw', 'cw'] = None,
+                        controller: LampController = Depends(get_controller)) -> list[LampDtlInfo]:
+    return await controller.get_all(sort, filter, detail)
 
 
 @router.get('/{lamp_article}', response_model=LampDtlInfo)

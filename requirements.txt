@@ -2,7 +2,7 @@ fastapi==0.115.4
 pip==24.3.1
 pydantic==2.9.2
 uvicorn==0.32.0
-pydantic-settings==2.6.1
+pydantic-settings==2.7.0
 pydantic==2.9.2
 asyncio==3.4.3
 pytest-asyncio==0.24.0

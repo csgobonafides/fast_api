@@ -1,25 +1,36 @@
-from datetime import timezone
-from sqlalchemy.orm import declarative_base
-from sqlalchemy import Column, UUID, String, DateTime, func, INT, ForeignKey, DECIMAL
-
-Base = declarative_base()
+from sqlalchemy.orm import DeclarativeBase, relationship
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Column, String, DateTime, func, INT, ForeignKey, DECIMAL, func
 
 
-class Manufacturer(Base):
+class BaseModel(DeclarativeBase):
+    id = Column(UUID, primary_key=True)
+    create_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now(), nullable=False)
+
+
+class Manufacturer(BaseModel):
+
     __tablename__ = "manufacturer"
-    id = Column(UUID, primary_key=True)
-    manufacturer = Column(String(20), unique=True, nullable=False)
-    country = Column(String(20), nullable=False)
-    create_at = Column(DateTime, server_default=func.now(tz=timezone.utc))
+    name = Column(String(200), unique=True, nullable=False)
+    country = Column(String(200), nullable=False)
+
+    def __repr__(self) -> str:
+        return f"Manufacturer({self.id=}, {self.name=}, {self.country=})"
 
 
-class Lamp(Base):
+class Lamp(BaseModel):
+
     __tablename__ = "lamp"
-    id = Column(UUID, primary_key=True)
     article = Column(INT, unique=True, nullable=False)
-    price = Column(DECIMAL(10, 2), nullable=False)
-    shape = Column(String(10), nullable=False)
-    base = Column(String(10), nullable=False)
-    temperature = Column(String(10), nullable=False)
+    price = Column(DECIMAL(50, 2), nullable=False)
+    shape = Column(String(100), nullable=False)
+    base = Column(String(100), nullable=False)
+    temperature = Column(String(100), nullable=False)
     manufacturer_id = Column(ForeignKey(Manufacturer.id), nullable=False)
-    create_at = Column(DateTime, server_default=func.now(tz=timezone.utc))
+
+    manufacturer = relationship(Manufacturer, backref="lamps")
+
+    def __repr__(self) -> str:
+        return (f"Lamp({self.id=}, {self.article}, {self.shape}, "
+                f"{self.base}, {self.temperature}, {self.manufacturer_id})")

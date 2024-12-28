@@ -1,16 +1,31 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings
+
+
+class DatabaseConfig(BaseSettings):
+    HOST: str
+    PORT: int
+    USERNAME: str
+    PASSWORD: str
+    NAME: str
+
+    def make_url(self, driver: str) -> str:
+        return f"{driver}://{self.USERNAME}:{self.PASSWORD}@{self.HOST}:{self.PORT}/{self.NAME}"
+
+    @property
+    def asyncpg_url(self) -> str:
+        return self.make_url(driver="postgresql+asyncpg")
+
+    @property
+    def postgresql_url(self) -> str:
+        return self.make_url(driver="postgresql")
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file='.env')
-    POSTGRES_HOST: str
-    POSTGRES_PORT: int
-    POSTGRES_USER: str
-    POSTGRES_PASSWORD: str
-    POSTGRES_DB: str
+    DB: DatabaseConfig
 
-    def dsn(self):
-        return f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+    class Config:
+        case_sensitive = True
+        env_nested_delimiter = "__"
 
 
 def get_settings() -> Settings:

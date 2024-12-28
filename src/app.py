@@ -10,16 +10,16 @@ from core.settings import get_settings
 
 import controllers.lamp as lamp_modul
 import controllers.manufacturer as manufacturer_modul
+from db.connector import DatabaseConnector
 
 config = get_settings()
-db = Database(config.dsn())
 logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     logger.info("Do something at application startup")
-    await db.connect()
+    db = DatabaseConnector(config.db_config.asyncpg_url)
     manufacturer_modul.manufacturer_controller = manufacturer_modul.ManufacturerController(db)
     lamp_modul.lamp_controller = lamp_modul.LampController(db)
     yield
