@@ -24,6 +24,7 @@ class Settings(BaseSettings):
     DB: DatabaseConfig
 
     class Config:
+        env_file = ".env"
         case_sensitive = True
         env_nested_delimiter = "__"
 

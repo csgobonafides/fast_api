@@ -1,12 +1,12 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, UUID4
 
 
 class ManufacturerRequest(BaseModel):
-    manufacturer: str
+    name: str
     country: str
 
 
 class ManufacturerResponse(BaseModel):
-    id: str
-    manufacturer: str
+    id: UUID4
+    name: str
     country: str

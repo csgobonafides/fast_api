@@ -1,6 +1,6 @@
-from typing import Literal
 from fastapi import APIRouter, Depends, status
-from schemas.lamp import LampIN, LampOUT, LampDtlInfo
+from schemas.lamp import LampIN, LampDtlInfo
+from schemas.enums import SortOrder, FilterType, DetailType
 from controllers.lamp import get_controller, LampController
 
 router = APIRouter()
@@ -12,13 +12,11 @@ async def create_lamp(lamp: LampIN, controller: LampController = Depends(get_con
 
 
 @router.get('/', response_model=list[LampDtlInfo])
-async def get_lamp_list(sort: Literal['asc', 'desc'] = "desc",
-                        filter: Literal['shape', 'base', 'temperature'] = None,
-                        detail: Literal['A60', 'C37', 'G45', 'R39', 'R50', 'R63',
-                        'E40', 'E27', 'E14',
-                        'ww', 'nw', 'cw'] = None,
+async def get_lamp_list(sort: SortOrder = SortOrder.desc,
+                        filters: FilterType = None,
+                        detail: DetailType = None,
                         controller: LampController = Depends(get_controller)) -> list[LampDtlInfo]:
-    return await controller.get_all(sort, filter, detail)
+    return await controller.get_all(sort, filters, detail)
 
 
 @router.get('/{lamp_article}', response_model=LampDtlInfo)

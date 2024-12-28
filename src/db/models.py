@@ -6,7 +6,7 @@ from sqlalchemy import Column, String, DateTime, func, INT, ForeignKey, DECIMAL,
 class BaseModel(DeclarativeBase):
     id = Column(UUID, primary_key=True)
     create_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now(), nullable=False)
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now(), nullable=True)
 
 
 class Manufacturer(BaseModel):

@@ -1,5 +1,5 @@
 from typing import Literal
-from pydantic import BaseModel
+from pydantic import BaseModel, UUID4
 
 
 class LampBase(BaseModel):
@@ -15,13 +15,13 @@ class LampIN(LampBase):
 
 
 class LampOUT(LampBase):
-    id: str
+    id: UUID4
     name: str
     country: str
 
 
 class LampDtlInfo(LampBase):
-    id: str
+    id: UUID4
     name: str
     shape: Literal['A60', 'C37', 'G45', 'R39', 'R50', 'R63']
     base: Literal["E40", "E27", "E14"]

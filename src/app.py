@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     logger.info("Do something at application startup")
-    db = DatabaseConnector(config.db_config.asyncpg_url)
+    db = DatabaseConnector(config.DB.asyncpg_url)
     manufacturer_modul.manufacturer_controller = manufacturer_modul.ManufacturerController(db)
     lamp_modul.lamp_controller = lamp_modul.LampController(db)
     yield
