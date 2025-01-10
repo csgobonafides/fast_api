@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, status
 from schemas.lamp import LampIN, LampDtlInfo
-from schemas.enums import SortOrder, FilterType, DetailType
+from schemas.enums import SortOrder, FilterType, ShapeType, BaseType, TemperatureType
 from controllers.lamp import get_controller, LampController
 import uuid
 
@@ -14,10 +14,11 @@ async def create_lamp(lamp: LampIN, controller: LampController = Depends(get_con
 
 @router.get('/', response_model=list[LampDtlInfo])
 async def get_lamp_list(sort: SortOrder = SortOrder.desc,
-                        filters: FilterType = None,
-                        detail: DetailType = None,
+                        shape: list[ShapeType] = None,
+                        base: list[BaseType] = None,
+                        temperature: list[TemperatureType] = None,
                         controller: LampController = Depends(get_controller)) -> list[LampDtlInfo]:
-    return await controller.get_all(sort, filters, detail)
+    return await controller.get_all(sort, shape, base, temperature)
 
 
 @router.get('/{lamp_id}', response_model=LampDtlInfo)

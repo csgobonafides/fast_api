@@ -1,7 +1,7 @@
 import uuid
 import logging
 from sqlalchemy.exc import IntegrityError
-from schemas.enums import SortOrder, FilterType, DetailType
+from schemas.enums import SortOrder, FilterType, ShapeType, BaseType, TemperatureType
 from sqlalchemy import select, desc, asc
 from sqlalchemy.orm import joinedload
 
@@ -49,29 +49,24 @@ class LampController:
         return await self.get_by_id(lamp_id)
 
     async def get_all(self, sort: SortOrder = SortOrder.desc,
-                      filters: FilterType = None,
-                      detail: DetailType = None
+                      shape: list[ShapeType] = None,
+                      base: list[BaseType] = None,
+                      temperature: list[TemperatureType] = None
                       ) -> list[LampDtlInfo]:
         logger.info("Request a list of light bulbs.")
 
         async with self.db.session_maker() as session:
-            if filters and detail:
-                if filters == 'shape' and detail not in ['A60', 'C37', 'G45', 'R39', 'R50', 'R63']:
-                    raise BadRequestError
-                if filters == 'base' and detail not in ['E40', 'E27', 'E14']:
-                    raise BadRequestError
-                if filters == 'temperature' and detail not in ['ww', 'nw', 'cw']:
-                    raise BadRequestError
-                cursor = await session.execute(
-                    select(Lamp, Manufacturer).options(joinedload(Lamp.manufacturer))
-                    .where(getattr(Lamp, filters) == detail)
-                    .order_by(desc(Lamp.price) if sort == "desc" else asc(Lamp.price))
-                )
-            else:
-                cursor = await session.execute(
-                    select(Lamp, Manufacturer).options(joinedload(Lamp.manufacturer))
-                    .order_by(desc(Lamp.price) if sort == "desc" else asc(Lamp.price)))
-            lmps = cursor.scalars().all()
+            query = select(Lamp, Manufacturer).options(joinedload(Lamp.manufacturer)
+                                                       ).order_by(desc(Lamp.price) if sort == "desc" else asc(Lamp.price))
+            if shape:
+                query = query.where(Lamp.shape.in_(shape))
+            if base:
+                query = query.where(Lamp.base.in_(base))
+            if temperature:
+                query = query.where(Lamp.temperature.in_(temperature))
+            result = await session.execute(query)
+            lmps = result.scalars().all()
+
         return [LampDtlInfo(id=lmp.id,
                             article=lmp.article,
                             price=lmp.price,
