@@ -1,5 +1,4 @@
 from fastapi import FastAPI, Request
-from databases import Database
 from api.lamps import router as lamp_router
 from api.manufacturers import router as manufacturer_router
 import logging

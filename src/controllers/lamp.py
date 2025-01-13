@@ -1,7 +1,7 @@
 import uuid
 import logging
 from sqlalchemy.exc import IntegrityError
-from schemas.enums import SortOrder, FilterType, ShapeType, BaseType, TemperatureType
+from schemas.enums import SortOrder, ShapeType, BaseType, TemperatureType
 from sqlalchemy import select, desc, asc
 from sqlalchemy.orm import joinedload
 
@@ -53,11 +53,11 @@ class LampController:
                       base: list[BaseType] = None,
                       temperature: list[TemperatureType] = None
                       ) -> list[LampDtlInfo]:
-        logger.info("Request a list of light bulbs.")
+        logger.info('Request a list of light bulbs.')
 
         async with self.db.session_maker() as session:
-            query = select(Lamp, Manufacturer).options(joinedload(Lamp.manufacturer)
-                                                       ).order_by(desc(Lamp.price) if sort == "desc" else asc(Lamp.price))
+            query = (select(Lamp, Manufacturer).options(joinedload(Lamp.manufacturer))
+                     .order_by(desc(Lamp.price) if sort == "desc" else asc(Lamp.price)))
             if shape:
                 query = query.where(Lamp.shape.in_(shape))
             if base:
@@ -80,7 +80,7 @@ class LampController:
                                 country=lmp.manufacturer.country),
                             )
                 for lmp in lmps
-        ]
+                ]
 
     async def get_by_id(self, lamp_id: uuid.UUID) -> LampDtlInfo:
         logger.info(f"Request for lamp by ID {lamp_id}.")
