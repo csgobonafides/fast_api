@@ -1,6 +1,6 @@
 from sqlalchemy.orm import DeclarativeBase, relationship
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy import Column, String, DateTime, func, INT, ForeignKey, DECIMAL, func
+from sqlalchemy import Column, String, DateTime, INT, ForeignKey, DECIMAL, func
 
 
 class BaseModel(DeclarativeBase):

@@ -15,11 +15,13 @@ async def create_lamp(lamp: LampIN, controller: LampController = Depends(get_con
 
 
 @router.get('/', response_model=list[LampDtlInfo])
-async def get_lamp_list(sort: SortOrder = SortOrder.desc,
-                        shape: list[ShapeType] = Query(None),
-                        base: list[BaseType] = Query(None),
-                        temperature: list[TemperatureType] = Query(None),
-                        controller: LampController = Depends(get_controller)) -> list[LampDtlInfo]:
+async def get_lamp_list(
+        sort: SortOrder = SortOrder.desc,
+        shape: list[ShapeType] = Query(None),
+        base: list[BaseType] = Query(None),
+        temperature: list[TemperatureType] = Query(None),
+        controller: LampController = Depends(get_controller)
+) -> list[LampDtlInfo]:
     return await controller.get_all(sort, shape, base, temperature)
 
 

@@ -56,7 +56,7 @@ class LampController:
         logger.info('Request a list of light bulbs.')
 
         async with self.db.session_maker() as session:
-            query = (select(Lamp, Manufacturer).options(joinedload(Lamp.manufacturer))
+            query = (select(Lamp).options(joinedload(Lamp.manufacturer))
                      .order_by(desc(Lamp.price) if sort == "desc" else asc(Lamp.price)))
             if shape:
                 query = query.where(Lamp.shape.in_(shape))
@@ -67,20 +67,23 @@ class LampController:
             result = await session.execute(query)
             lmps = result.scalars().all()
 
-        return [LampDtlInfo(id=lmp.id,
-                            article=lmp.article,
-                            price=lmp.price,
-                            shape=lmp.shape,
-                            base=lmp.base,
-                            temperature=lmp.temperature,
-                            create_at=str(lmp.create_at),
-                            manufacturer=ManufacturerResponse(
-                                id=lmp.manufacturer.id,
-                                name=lmp.manufacturer.name,
-                                country=lmp.manufacturer.country),
-                            )
-                for lmp in lmps
-                ]
+        return [
+            LampDtlInfo(
+                id=lmp.id,
+                article=lmp.article,
+                price=lmp.price,
+                shape=lmp.shape,
+                base=lmp.base,
+                temperature=lmp.temperature,
+                create_at=str(lmp.create_at),
+                manufacturer=ManufacturerResponse(
+                    id=lmp.manufacturer.id,
+                    name=lmp.manufacturer.name,
+                    country=lmp.manufacturer.country
+                ),
+            )
+            for lmp in lmps
+        ]
 
     async def get_by_id(self, lamp_id: uuid.UUID) -> LampDtlInfo:
         logger.info(f"Request for lamp by ID {lamp_id}.")
