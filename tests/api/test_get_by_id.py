@@ -1,22 +1,36 @@
+from uuid import uuid4
+from unittest.mock import ANY
+
 import pytest
 from httpx import AsyncClient
-from schemas.lamp import LampDtlInfo
+
+from db.models import Lamp, Manufacturer
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("lamp_id, expected", [
-    ("1", {"id": "1", "name": "gauss", "price": 134.2, "article": 112233, "shape": "R50", "base": "E14", "temperature": "cw"}),
-    ("2", {"id": "2", "name": "sweko", "price": 89.0, "article": 441122, "shape": "A60", "base": "E27", "temperature": "nw"}),
-    ("3", {"id": "3", "name": "uniel", "price": 13.2, "article": 379283, "shape": "A60", "base": "E27", "temperature": "nw"})
-    ])
-async def test_get_by_id_200(xclient: AsyncClient, lamp_id, expected: LampDtlInfo):
-    response = await xclient.get(f"/lamps/{lamp_id}")
+@pytest.mark.usefixtures("prepare_lamp")
+async def test_get_by_id_200(xclient: AsyncClient, lamp: Lamp, manufacturer: Manufacturer):
+    response = await xclient.get(f"/lamp/{lamp.id}")
     assert response.status_code == 200, response.text
-    assert response.json() == expected
+    assert response.json() == {
+        "id": str(lamp.id),
+        "article": lamp.article,
+        "price": lamp.price,
+        "shape": lamp.shape,
+        "base": lamp.base,
+        "temperature": lamp.temperature,
+        "create_at": ANY,
+        "manufacturer": {
+            "id": str(manufacturer.id),
+            "name": manufacturer.name,
+            "country": manufacturer.country
+        }
+    }
 
 
 @pytest.mark.asyncio
-async def test_get_by_id_404(xclient: AsyncClient):
-    response = await xclient.get("/lamps/999")
+@pytest.mark.usefixtures("prepare_lamp")
+async def test_get_by_id_404(xclient: AsyncClient, lamp: Lamp, manufacturer: Manufacturer):
+    response = await xclient.get(f"/lamp/{uuid4()}")
     assert response.status_code == 404, response.text
-    assert response.json() == {"detail": "not_found_error"}
+    assert response.json() == {"detail": "Lamp not found."}
