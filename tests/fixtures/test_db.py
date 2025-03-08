@@ -26,13 +26,11 @@ def database(settings: Settings) -> DatabaseConfig:
 
 @pytest.fixture(scope="session")
 def prepare_test_database(database_name: str, database: DatabaseConfig) -> None:
-    real_database_dsn = (
-        f"postgresql://{database.USERNAME}:{database.PASSWORD}@{database.HOST}:{database.PORT}/{database.NAME}"
-    )
-    test_database_dsn = (
-        f"postgresql://{database.USERNAME}:{database.PASSWORD}@{database.HOST}:{database.PORT}/{database_name}"
-    )
-    with create_engine(real_database_dsn, isolation_level="AUTOCOMMIT").connect() as connection:
+    real_database_dsn = f"postgresql://{database.USERNAME}:{database.PASSWORD}@{database.HOST}:{database.PORT}/{database.NAME}"
+    test_database_dsn = f"postgresql://{database.USERNAME}:{database.PASSWORD}@{database.HOST}:{database.PORT}/{database_name}"
+    with create_engine(
+        real_database_dsn, isolation_level="AUTOCOMMIT"
+    ).connect() as connection:
         connection.execute(text(f'CREATE DATABASE "{database_name}"'))
     try:
         migration_dir = ROOT_DIR / "db" / "alembic"
@@ -45,7 +43,9 @@ def prepare_test_database(database_name: str, database: DatabaseConfig) -> None:
         yield test_database_dsn
 
     finally:
-        with create_engine(real_database_dsn, isolation_level="AUTOCOMMIT").connect() as connection:
+        with create_engine(
+            real_database_dsn, isolation_level="AUTOCOMMIT"
+        ).connect() as connection:
             q1 = text(
                 "SELECT pg_terminate_backend(pg_stat_activity.pid) "  # noqa: S608
                 "FROM pg_stat_activity "
@@ -57,12 +57,18 @@ def prepare_test_database(database_name: str, database: DatabaseConfig) -> None:
 
 
 @pytest.fixture
-def test_db(prepare_test_database: str, database: DatabaseConfig, database_name: str) -> DatabaseConnector:
+def test_db(
+    prepare_test_database: str, database: DatabaseConfig, database_name: str
+) -> DatabaseConnector:
     conf = database.copy(update={"NAME": database_name})
     _db = DatabaseConnector(conf.asyncpg_url)
     yield _db
     start_time = datetime.now()
-    with create_engine(prepare_test_database, isolation_level="AUTOCOMMIT").connect() as connection:
+    with create_engine(
+        prepare_test_database, isolation_level="AUTOCOMMIT"
+    ).connect() as connection:
         tables = ",".join(f'"{str(table)}"' for table in BaseModel.metadata.tables)
         connection.execute(text(f"TRUNCATE TABLE {tables} CASCADE"))
-    print(f"Truncate tables took {datetime.now() - start_time} seconds, truncated tables: {tables}")
+    print(
+        f"Truncate tables took {datetime.now() - start_time} seconds, truncated tables: {tables}"
+    )

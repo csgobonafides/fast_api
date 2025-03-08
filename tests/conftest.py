@@ -28,8 +28,12 @@ async def lamp_controller(test_db: DatabaseConnector) -> lamp_module.LampControl
 
 
 @pytest_asyncio.fixture(autouse=True)
-async def manufacturer_controller(test_db: DatabaseConnector) -> manufacturer_module.ManufacturerController:
-    manufacturer_module.manufacturer_controller = manufacturer_module.ManufacturerController(test_db)
+async def manufacturer_controller(
+    test_db: DatabaseConnector,
+) -> manufacturer_module.ManufacturerController:
+    manufacturer_module.manufacturer_controller = (
+        manufacturer_module.ManufacturerController(test_db)
+    )
     yield manufacturer_module.manufacturer_controller
 
 

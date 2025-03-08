@@ -15,24 +15,27 @@ class ManufacturerController:
     def __init__(self, db: DatabaseConnector):
         self.db = db
 
-    async def add_manufacturer(self, manufacturer: ManufacturerRequest) -> ManufacturerResponse:
+    async def add_manufacturer(
+        self, manufacturer: ManufacturerRequest
+    ) -> ManufacturerResponse:
         logger.info(f"Requested to create a manufacturer {manufacturer.name}.")
 
         manufact_id = uuid.uuid4()
         async with self.db.session_maker() as session:
             try:
                 manufact = Manufacturer(
-                    id=manufact_id,
-                    name=manufacturer.name,
-                    country=manufacturer.country
+                    id=manufact_id, name=manufacturer.name, country=manufacturer.country
                 )
                 session.add(manufact)
                 await session.commit()
             except IntegrityError:
-                logger.error(f"Attempting to add an existing manufacturer {manufacturer.name}.")
+                logger.error(
+                    f"Attempting to add an existing manufacturer {manufacturer.name}."
+                )
                 raise NotFoundError("An object with this name already exists.")
-        return ManufacturerResponse(id=manufact_id, name=manufacturer.name,
-                                    country=manufacturer.country)
+        return ManufacturerResponse(
+            id=manufact_id, name=manufacturer.name, country=manufacturer.country
+        )
 
     async def get_all_manufacturer(self) -> list[ManufacturerResponse]:
         logger.info("A list of all manufacturers was requested.")
@@ -41,8 +44,7 @@ class ManufacturerController:
             cursor = await session.execute(select(Manufacturer))
             manufacts = cursor.scalars().all()
         return [
-            ManufacturerResponse(id=man.id, name=man.name,
-                                 country=man.country)
+            ManufacturerResponse(id=man.id, name=man.name, country=man.country)
             for man in manufacts
         ]
 
@@ -53,8 +55,9 @@ class ManufacturerController:
             manufact = await session.get(Manufacturer, name_id)
         if not manufact:
             raise NotFoundError("Manufacturer not found.")
-        return ManufacturerResponse(id=manufact.id, name=manufact.name,
-                                    country=manufact.country)
+        return ManufacturerResponse(
+            id=manufact.id, name=manufact.name, country=manufact.country
+        )
 
     async def del_by_id(self, name_id: uuid.UUID) -> None:
         async with self.db.session_maker() as session:

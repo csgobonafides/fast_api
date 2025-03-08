@@ -21,12 +21,14 @@ def lamp(lamp_id: UUID, manufacturer_id: UUID) -> Lamp:
         shape="A60",
         base="E27",
         temperature="nw",
-        manufacturer_id=manufacturer_id
+        manufacturer_id=manufacturer_id,
     )
 
 
 @pytest_asyncio.fixture
-async def prepare_lamp(test_db: DatabaseConnector, lamp: Lamp, prepare_manufacturer: None) -> None:
+async def prepare_lamp(
+    test_db: DatabaseConnector, lamp: Lamp, prepare_manufacturer: None
+) -> None:
     async with test_db.session_maker(expire_on_commit=False) as session:
         session.add(lamp)
         await session.commit()

@@ -9,7 +9,9 @@ from db.models import Lamp, Manufacturer
 
 @pytest.mark.asyncio
 @pytest.mark.usefixtures("prepare_lamp")
-async def test_get_by_id_200(xclient: AsyncClient, lamp: Lamp, manufacturer: Manufacturer):
+async def test_get_by_id_200(
+    xclient: AsyncClient, lamp: Lamp, manufacturer: Manufacturer
+):
     response = await xclient.get(f"/lamp/{lamp.id}")
     assert response.status_code == 200, response.text
     assert response.json() == {
@@ -23,14 +25,16 @@ async def test_get_by_id_200(xclient: AsyncClient, lamp: Lamp, manufacturer: Man
         "manufacturer": {
             "id": str(manufacturer.id),
             "name": manufacturer.name,
-            "country": manufacturer.country
-        }
+            "country": manufacturer.country,
+        },
     }
 
 
 @pytest.mark.asyncio
 @pytest.mark.usefixtures("prepare_lamp")
-async def test_get_by_id_404(xclient: AsyncClient, lamp: Lamp, manufacturer: Manufacturer):
+async def test_get_by_id_404(
+    xclient: AsyncClient, lamp: Lamp, manufacturer: Manufacturer
+):
     response = await xclient.get(f"/lamp/{uuid4()}")
     assert response.status_code == 404, response.text
     assert response.json() == {"detail": "Lamp not found."}

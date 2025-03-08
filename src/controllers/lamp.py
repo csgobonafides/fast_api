@@ -6,7 +6,7 @@ from sqlalchemy import select, desc, asc
 from sqlalchemy.orm import joinedload
 
 from db.connector import DatabaseConnector
-from db.models import Lamp, Manufacturer
+from db.models import Lamp
 from core.exceptions import BadRequestError, NotFoundError
 from schemas.lamp import LampDtlInfo, LampIN
 from schemas.manufacturer import ManufacturerResponse
@@ -32,32 +32,41 @@ class LampController:
                     shape=lamp.shape,
                     base=lamp.base,
                     temperature=lamp.temperature,
-                    manufacturer_id=lamp.manufacturer_id
+                    manufacturer_id=lamp.manufacturer_id,
                 )
                 session.add(lmp)
                 await session.commit()
             except IntegrityError as IError:
-                if 'manufacturer_id' in str(IError.orig):
-                    logger.error(f"Attempt to add a manufacturer with a non-existent identifier {lamp.manufacturer_id}.")
+                if "manufacturer_id" in str(IError.orig):
+                    logger.error(
+                        f"Attempt to add a manufacturer with a non-existent identifier {lamp.manufacturer_id}."
+                    )
                     raise NotFoundError("There is no manufacturer with such an ID.")
-                elif 'article' in str(IError.orig):
-                    logger.error(f"The lamp with the article {lamp.article} already exists.")
+                elif "article" in str(IError.orig):
+                    logger.error(
+                        f"The lamp with the article {lamp.article} already exists."
+                    )
                     raise NotFoundError("The lamp with the article already exists.")
                 else:
                     logger.error("An unexpected integrity error occurred.")
                     raise IError.detail
         return await self.get_by_id(lamp_id)
 
-    async def get_all(self, sort: SortOrder = SortOrder.desc,
-                      shape: list[ShapeType] = None,
-                      base: list[BaseType] = None,
-                      temperature: list[TemperatureType] = None
-                      ) -> list[LampDtlInfo]:
-        logger.info('Request a list of light bulbs.')
+    async def get_all(
+        self,
+        sort: SortOrder = SortOrder.desc,
+        shape: list[ShapeType] = None,
+        base: list[BaseType] = None,
+        temperature: list[TemperatureType] = None,
+    ) -> list[LampDtlInfo]:
+        logger.info("Request a list of light bulbs.")
 
         async with self.db.session_maker() as session:
-            query = (select(Lamp).options(joinedload(Lamp.manufacturer))
-                     .order_by(desc(Lamp.price) if sort == "desc" else asc(Lamp.price)))
+            query = (
+                select(Lamp)
+                .options(joinedload(Lamp.manufacturer))
+                .order_by(desc(Lamp.price) if sort == "desc" else asc(Lamp.price))
+            )
             if shape:
                 query = query.where(Lamp.shape.in_(shape))
             if base:
@@ -79,7 +88,7 @@ class LampController:
                 manufacturer=ManufacturerResponse(
                     id=lmp.manufacturer.id,
                     name=lmp.manufacturer.name,
-                    country=lmp.manufacturer.country
+                    country=lmp.manufacturer.country,
                 ),
             )
             for lmp in lmps
@@ -89,20 +98,25 @@ class LampController:
         logger.info(f"Request for lamp by ID {lamp_id}.")
 
         async with self.db.session_maker() as session:
-            lmp = await session.get(Lamp, lamp_id, options=[joinedload(Lamp.manufacturer)])
+            lmp = await session.get(
+                Lamp, lamp_id, options=[joinedload(Lamp.manufacturer)]
+            )
             if not lmp:
                 raise NotFoundError("Lamp not found.")
-            return LampDtlInfo(id=lamp_id,
-                               article=lmp.article,
-                               price=lmp.price,
-                               shape=lmp.shape,
-                               base=lmp.base,
-                               temperature=lmp.temperature,
-                               create_at=str(lmp.create_at),
-                               manufacturer=ManufacturerResponse(
-                                   id=lmp.manufacturer.id,
-                                   name=lmp.manufacturer.name,
-                                   country=lmp.manufacturer.country))
+            return LampDtlInfo(
+                id=lamp_id,
+                article=lmp.article,
+                price=lmp.price,
+                shape=lmp.shape,
+                base=lmp.base,
+                temperature=lmp.temperature,
+                create_at=str(lmp.create_at),
+                manufacturer=ManufacturerResponse(
+                    id=lmp.manufacturer.id,
+                    name=lmp.manufacturer.name,
+                    country=lmp.manufacturer.country,
+                ),
+            )
 
     async def del_by_id(self, lamp_id: uuid.UUID) -> None:
         async with self.db.session_maker() as session:
@@ -119,5 +133,5 @@ lamp_controller: LampController = None
 
 def get_controller():
     if lamp_controller is None:
-        raise BadRequestError('Controller is none.')
+        raise BadRequestError("Controller is none.")
     return lamp_controller

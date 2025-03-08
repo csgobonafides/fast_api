@@ -8,7 +8,7 @@ from db.models import Lamp, Manufacturer
 @pytest.mark.asyncio
 @pytest.mark.usefixtures("prepare_lamp")
 async def test_get_all(xclient: AsyncClient, lamp: Lamp, manufacturer: Manufacturer):
-    response = await xclient.get('/lamp/')
+    response = await xclient.get("/lamp/")
     assert response.status_code == 200, response.text
     assert response.json() == [
         {
@@ -22,7 +22,7 @@ async def test_get_all(xclient: AsyncClient, lamp: Lamp, manufacturer: Manufactu
             "manufacturer": {
                 "id": str(manufacturer.id),
                 "name": manufacturer.name,
-                "country": manufacturer.country
-            }
+                "country": manufacturer.country,
+            },
         }
     ]

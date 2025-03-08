@@ -13,6 +13,6 @@ async def test_list_manufacturer_200(xclient: AsyncClient, manufacturer: Manufac
         {
             "id": str(manufacturer.id),
             "name": manufacturer.name,
-            "country": manufacturer.country
+            "country": manufacturer.country,
         }
     ]

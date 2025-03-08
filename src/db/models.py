@@ -5,7 +5,9 @@ from sqlalchemy import Column, String, DateTime, INT, ForeignKey, DECIMAL, func
 
 class BaseModel(DeclarativeBase):
     id = Column(UUID, primary_key=True)
-    create_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    create_at = Column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
     updated_at = Column(DateTime(timezone=True), onupdate=func.now(), nullable=True)
 
 
@@ -32,5 +34,7 @@ class Lamp(BaseModel):
     manufacturer = relationship(Manufacturer, backref="lamps")
 
     def __repr__(self) -> str:
-        return (f"Lamp({self.id=}, {self.article}, {self.shape}, "
-                f"{self.base}, {self.temperature}, {self.manufacturer_id})")
+        return (
+            f"Lamp({self.id=}, {self.article}, {self.shape}, "
+            f"{self.base}, {self.temperature}, {self.manufacturer_id})"
+        )

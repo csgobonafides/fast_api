@@ -19,16 +19,18 @@ logger = logging.getLogger(__name__)
 async def lifespan(_app: FastAPI):
     logger.info("Do something at application startup")
     db = DatabaseConnector(config.DB.asyncpg_url)
-    manufacturer_modul.manufacturer_controller = manufacturer_modul.ManufacturerController(db)
+    manufacturer_modul.manufacturer_controller = (
+        manufacturer_modul.ManufacturerController(db)
+    )
     lamp_modul.lamp_controller = lamp_modul.LampController(db)
     yield
     logger.info("Do something at application shutdown")
     await db.disconnect()
 
 
-app = FastAPI(lifespan=lifespan, title='FastAPI')
-app.include_router(manufacturer_router, tags=['manufacturer'], prefix='/manufacturer')
-app.include_router(lamp_router, tags=['lamp'], prefix='/lamp')
+app = FastAPI(lifespan=lifespan, title="FastAPI")
+app.include_router(manufacturer_router, tags=["manufacturer"], prefix="/manufacturer")
+app.include_router(lamp_router, tags=["lamp"], prefix="/lamp")
 
 
 @app.exception_handler(Exception)
@@ -36,25 +38,26 @@ async def common_exception_handler(request: Request, exc: Exception):
     return JSONResponse(
         status_code=500,
         content={
-            'message': (
-                f'Failed method {request.method} at URL {request.url}'
-                f'exception message is {exc!r}.'
+            "message": (
+                f"Failed method {request.method} at URL {request.url}"
+                f"exception message is {exc!r}."
             )
         },
     )
 
 
-@app.middleware('http')
+@app.middleware("http")
 async def time_log_middleware(request: Request, call_next):
     start_time = monotonic()
     try:
         return await call_next(request)
     finally:
         finish_time = 1000.0 * (monotonic() - start_time)
-        process_time = '{:0.6f}|ms'.format(finish_time)
-        logger.info(f'Response: {request.url.path} Duration {process_time}')
+        process_time = "{:0.6f}|ms".format(finish_time)
+        logger.info(f"Response: {request.url.path} Duration {process_time}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host='127.0.0.1', port=8000, log_config="core/logging.yaml")
+
+    uvicorn.run(app, host="127.0.0.1", port=8000, log_config="core/logging.yaml")

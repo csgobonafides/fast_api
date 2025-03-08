@@ -14,15 +14,13 @@ def manufacturer_id() -> UUID:
 
 @pytest.fixture
 def manufacturer(manufacturer_id: UUID) -> Manufacturer:
-    return Manufacturer(
-        id=manufacturer_id,
-        name="Uniel",
-        country="USA"
-    )
+    return Manufacturer(id=manufacturer_id, name="Uniel", country="USA")
 
 
 @pytest_asyncio.fixture
-async def prepare_manufacturer(test_db: DatabaseConnector, manufacturer: Manufacturer) -> None:
+async def prepare_manufacturer(
+    test_db: DatabaseConnector, manufacturer: Manufacturer
+) -> None:
     async with test_db.session_maker(expire_on_commit=False) as session:
         session.add(manufacturer)
         await session.commit()
